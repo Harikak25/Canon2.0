@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+.env.*
+instance/
+.pytest_cache/
+.coverage
+dist/
+build/
+
+# Node / React (if present)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vite/
+.next/
+out/
+coverage/
+
+# Docker and local volumes
+docker-data/
+**/data/
+**/tmp/
+**/logs/
+*.pid
+*.log
+
+# MailHog and Postgres named volumes (safety)
+mailhog/
+mailhog-data/
+postgres/
+pgdata/
+db-data/
+
+# OS and IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets and keys
+secrets.json
+*.pem
+*.key
+*.crt
