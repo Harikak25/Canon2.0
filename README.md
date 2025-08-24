@@ -3,7 +3,7 @@
 
 
 
-# Complaints Project
+# CANON Project
 
 This project implements a simple **complaint management pipeline** using Angular, FastAPI, PostgreSQL, Kafka, and Gmail SMTP.  
 
