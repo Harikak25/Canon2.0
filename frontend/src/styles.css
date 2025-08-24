@@ -1,0 +1,32 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+  background: linear-gradient(120deg, #f7fafc 0%, #f0f3fa 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #23234c;
+}
+
+.app-header {
+  text-align: center;
+  padding: 38px 10px 18px 10px;
+}
+
+.app-title {
+  font-size: 2.3rem;
+  font-weight: bold;
+  color: #3e57e8;
+  margin-bottom: 7px;
+  letter-spacing: -1px;
+  text-shadow: 0 1.5px 8px rgba(60,80,200,0.10);
+}
+
+.app-tagline {
+  font-size: 1.13rem;
+  color: #424257;
+  margin-bottom: 0;
+  max-width: 530px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.55;
+}
