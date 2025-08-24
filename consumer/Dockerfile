@@ -3,9 +3,14 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 
+COPY --chown=appuser:app tests/ /app/tests/
+
 # Install dependencies as root so uvicorn is available in PATH
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install pytest
 
 # Create non-root user and switch
 RUN adduser --disabled-password --gecos '' appuser \

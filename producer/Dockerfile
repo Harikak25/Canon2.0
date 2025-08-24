@@ -1,4 +1,5 @@
 FROM python:3.11-slim
+ENV PYTHONPATH=/app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -14,10 +15,12 @@ WORKDIR /app
 # Copy requirements as non-root-owned files and install
 COPY --chown=appuser:app requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt pytest
+
 
 # Copy application code with correct ownership
 COPY --chown=appuser:app app/ /app/app/
+COPY --chown=appuser:app tests/ /app/tests/
 
 # Drop privileges
 USER appuser

@@ -1,0 +1,87 @@
+<form (ngSubmit)="sendMessage()" enctype="multipart/form-data" class="form-container" #formRef="ngForm">
+  <h2>Contact Us</h2>
+
+  <div class="form-group">
+    <label for="firstName">First Name *</label>
+    <input
+      id="firstName"
+      name="firstName"
+      [(ngModel)]="firstName"
+      required
+      #fn="ngModel"
+      type="text"
+      autocomplete="given-name"
+    />
+    <div class="error" *ngIf="fn.invalid && fn.touched">First Name is required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="lastName">Last Name *</label>
+    <input
+      id="lastName"
+      name="lastName"
+      [(ngModel)]="lastName"
+      required
+      #ln="ngModel"
+      type="text"
+      autocomplete="family-name"
+    />
+    <div class="error" *ngIf="ln.invalid && ln.touched">Last Name is required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email *</label>
+    <input
+      id="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      #em="ngModel"
+      type="email"
+      autocomplete="email"
+    />
+    <div class="error" *ngIf="em.invalid && em.touched">Valid email is required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="subject">Subject *</label>
+    <input
+      id="subject"
+      name="subject"
+      [(ngModel)]="subject"
+      required
+      #sj="ngModel"
+      type="text"
+    />
+    <div class="error" *ngIf="sj.invalid && sj.touched">Subject is required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="message">Message *</label>
+    <textarea
+      id="message"
+      name="message"
+      [(ngModel)]="message"
+      required
+      #mg="ngModel"
+      rows="5"
+      autocomplete="off"
+    ></textarea>
+    <div class="error" *ngIf="mg.invalid && mg.touched">Message is required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="file">Attachment (optional)</label>
+    <input
+      id="file"
+      type="file"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <button type="submit" [disabled]="formRef.invalid">Send</button>
+
+  <div *ngIf="statusMsg" [ngClass]="{'success': statusMsgColor === 'success', 'error': statusMsgColor === 'error'}" class="status">
+    {{ statusMsg }}
+  </div>
+</form>

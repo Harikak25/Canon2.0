@@ -2,6 +2,7 @@ import uuid, os
 import logging, traceback, time
 import socket
 from fastapi import FastAPI, HTTPException, Body
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from pydantic import BaseModel, EmailStr
@@ -35,6 +36,18 @@ app = FastAPI(
     license_info={"name": "Proprietary"},
     docs_url="/docs",
     redoc_url="/redoc",
+)
+
+# Enable CORS for Angular dev server
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:4200",
+        "http://127.0.0.1:4200"
+    ],  # Angular dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Global exception handler to ensure endpoints never break

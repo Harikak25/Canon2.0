@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  producer:
+    volumes:
+      - ./producer:/app
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  consumer:
+    volumes:
+      - ./consumer:/app
+    environment:
+      - SMTP_EMAIL=harikabhavani.hb@gmail.com
+      - SMTP_PASSWORD=ydhfipjhzlxhvehi
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=harikabhavani.hb@gmail.com
+      - SMTP_STARTTLS=true
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001
