@@ -11,7 +11,6 @@ class EmailRecord(Base):
     email_id: Mapped[str] = mapped_column(Text, nullable=False)
     first_name: Mapped[str] = mapped_column(Text, nullable=False)
     last_name: Mapped[str] = mapped_column(Text, nullable=False)
-    email: Mapped[str] = mapped_column(Text, nullable=False)
     subject: Mapped[str] = mapped_column(Text, nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     attachment_name: Mapped[str | None] = mapped_column(Text, nullable=True)

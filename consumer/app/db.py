@@ -8,7 +8,9 @@ DATABASE_URL = os.getenv("DATABASE_URL") or \
     f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST','postgres')}:{os.getenv('POSTGRES_PORT','5432')}/{os.getenv('POSTGRES_DB')}"
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+safe_url = DATABASE_URL.replace(os.getenv('POSTGRES_PASSWORD',''), '***') if os.getenv('POSTGRES_PASSWORD') else DATABASE_URL
+logging.info("Connecting to database %s", safe_url)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
 
 
 # Utility context manager for safe DB session handling
