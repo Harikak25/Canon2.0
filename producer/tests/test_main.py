@@ -179,3 +179,99 @@ def test_submit_kafka_retry(monkeypatch):
 
 
 
+
+
+# Test /health when DB connection fails (simulate SessionLocal.execute raising)
+def test_health_check_db_failure(monkeypatch):
+    from app import main
+    class DummySessionFail:
+        def execute(self, stmt): raise Exception("DB error")
+        def close(self): pass
+    monkeypatch.setattr(main, "SessionLocal", lambda: DummySessionFail())
+    response = client.get("/health")
+    assert response.status_code == 500
+    json_data = response.json()
+    assert "detail" in json_data
+    assert json_data["detail"]["message"] == "Database not reachable"
+
+
+# Test /ready when DB fails but Kafka succeeds (partial readiness failure)
+def test_readiness_db_fails_kafka_ok(monkeypatch):
+    from app import main
+    class DummySessionFail:
+        def execute(self, stmt): raise Exception("DB fail")
+        def close(self): pass
+    monkeypatch.setattr(main, "SessionLocal", lambda: DummySessionFail())
+    class DummySocket:
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc_val, exc_tb): pass
+    def dummy_create_connection(*args, **kwargs): return DummySocket()
+    monkeypatch.setattr(main.socket, "create_connection", dummy_create_connection)
+    response = client.get("/ready")
+    assert response.status_code == 503
+    data = response.json()
+    assert data["detail"]["ok"] is False
+    assert data["detail"]["db_ok"] is False
+    assert data["detail"]["kafka_ok"] is True
+
+
+# Test /ready when DB succeeds but Kafka fails (other partial failure)
+def test_readiness_db_ok_kafka_fails(monkeypatch):
+    from app import main
+    class DummySession:
+        def execute(self, stmt): return 1
+        def close(self): pass
+    monkeypatch.setattr(main, "SessionLocal", lambda: DummySession())
+    def dummy_create_connection(*args, **kwargs): raise Exception("Kafka down")
+    monkeypatch.setattr(main.socket, "create_connection", dummy_create_connection)
+    response = client.get("/ready")
+    assert response.status_code == 503
+    data = response.json()
+    assert data["detail"]["ok"] is False
+    assert data["detail"]["db_ok"] is True
+    assert data["detail"]["kafka_ok"] is False
+
+
+# Test /submit when Kafka publish fails all retries
+def test_submit_kafka_fails_all_retries(monkeypatch):
+    from app import main
+    def always_fail_publish(msg): raise Exception("Kafka always fails")
+    monkeypatch.setattr(main, "publish", always_fail_publish)
+    payload = {
+        "email_id": "failkafka@example.com",
+        "first_name": "Fail",
+        "last_name": "Kafka",
+        "subject": "Kafka Failure",
+        "body": "Kafka should fail all retries"
+    }
+    response = client.post("/submit", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["status"] == "saved"
+    assert data.get("warning") == "Message not queued to Kafka."
+# Simulate DB failure during commit in /submit
+def test_submit_db_commit_failure(monkeypatch):
+    from app import main
+    class DummySessionCommitFail:
+        def __init__(self):
+            self.added = []
+        def add(self, obj):
+            self.added.append(obj)
+        def commit(self):
+            raise Exception("Simulated DB commit failure")
+        def refresh(self, obj): pass
+        def close(self): pass
+        def rollback(self): pass
+    monkeypatch.setattr(main, "SessionLocal", lambda: DummySessionCommitFail())
+    payload = {
+        "email_id": "faildb@example.com",
+        "first_name": "Fail",
+        "last_name": "DB",
+        "subject": "DB Failure",
+        "body": "This should simulate DB commit failure"
+    }
+    response = client.post("/submit", json=payload)
+    assert response.status_code == 500
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"].get("message") == "Database error. Please try again later."
